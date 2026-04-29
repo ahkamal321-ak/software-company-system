@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request New Project</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <h1>Request New Project</h1>
+
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="clients.html">Clients</a>
+        <a href="projects.html">Projects</a>
+        <a href="index.html">Logout</a>
+    </nav>
+
+    <hr>
+
+    <h2>Client Project Request Form</h2>
+
+    <form>
+
+        <label>Client Name</label>
+        <input type="text" placeholder="Enter client name" required>
+
+        <label>Company Name</label>
+        <input type="text" placeholder="Enter company name" required>
+
+        <label>Email</label>
+        <input type="email" placeholder="Enter email" required>
+
+        <label>Project Type</label>
+        <select required>
+            <option>Website</option>
+            <option>Mobile Application</option>
+            <option>Desktop System</option>
+            <option>E-Commerce Platform</option>
+            <option>CRM System</option>
+        </select>
+
+        <label>Project Description</label>
+        <input type="text" placeholder="Describe the project" required>
+
+        <label>Budget</label>
+        <input type="text" placeholder="Enter budget" required>
+
+        <label>Deadline</label>
+        <input type="date" required>
+
+        <button type="submit">Submit Request</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

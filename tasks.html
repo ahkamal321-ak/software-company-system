@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Assignment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="dashboard">
+
+        <h1>Task Assignment</h1>
+
+        <nav>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="employees.html">Employees</a>
+            <a href="projects.html">Projects</a>
+            <a href="clients.html">Clients</a>
+        </nav>
+
+        <hr>
+
+        <h2>Assign Tasks to Developers</h2>
+
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Developer</th>
+                <th>Task</th>
+                <th>Project</th>
+                <th>Status</th>
+            </tr>
+
+            <tr>
+                <td>Ahmed</td>
+                <td>Build Login Page</td>
+                <td>E-Commerce Website</td>
+                <td>In Progress</td>
+            </tr>
+
+            <tr>
+                <td>Omar</td>
+                <td>Create Database API</td>
+                <td>CRM System</td>
+                <td>Completed</td>
+            </tr>
+
+            <tr>
+                <td>Sara</td>
+                <td>Design Dashboard UI</td>
+                <td>Mobile Application</td>
+                <td>Under Review</td>
+            </tr>
+        </table>
+
+        <hr>
+
+        <h2>Add New Task</h2>
+
+        <form>
+            <label>Developer Name</label>
+            <input type="text" placeholder="Enter developer name">
+
+            <label>Task Name</label>
+            <input type="text" placeholder="Enter task">
+
+            <label>Project Name</label>
+            <input type="text" placeholder="Enter project name">
+
+            <label>Status</label>
+            <select>
+                <option>Not Started</option>
+                <option>In Progress</option>
+                <option>Under Review</option>
+                <option>Completed</option>
+            </select>
+
+            <button type="submit" onclick="taskAdded()">Assign Task</button>
+        </form>
+
+    </div>
+    <script src="script.js"></script>
+
+</body>
+</html>
