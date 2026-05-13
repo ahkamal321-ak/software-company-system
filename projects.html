@@ -1,60 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Project</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
-    <div class="dashboard">
+<button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
-        <h1>Project Management</h1>
+<div class="dashboard">
 
-        <nav>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="employees.html">Employees</a>
-            <a href="tasks.html">Tasks</a>
-            <a href="clients.html">Clients</a>
-        </nav>
+<h1>Request New Project</h1>
 
-        <hr>
+<form onsubmit="addProject(event)">
 
-        <h2>Projects List</h2>
+<input type="text" id="client" placeholder="Client Name" required>
+<input type="text" id="company" placeholder="Company Name" required>
+<input type="email" id="email" placeholder="Email" required>
 
-        <table border="1" cellpadding="10">
-            <tr>
-                <th>Project Name</th>
-                <th>Client</th>
-                <th>Deadline</th>
-                <th>Status</th>
-            </tr>
+<select id="type">
+<option>Website</option>
+<option>Mobile App</option>
+<option>Desktop System</option>
+<option>CRM</option>
+</select>
 
-            <tr>
-                <td>E-Commerce Website</td>
-                <td>ABC Company</td>
-                <td>15 May 2026</td>
-                <td>In Progress</td>
-            </tr>
+<input type="text" id="description" placeholder="Description" required>
+<input type="text" id="budget" placeholder="Budget" required>
+<input type="date" id="deadline" required>
 
-            <tr>
-                <td>Mobile Application</td>
-                <td>XYZ Group</td>
-                <td>30 June 2026</td>
-                <td>Planning</td>
-            </tr>
+<button type="submit">Add Project</button>
 
-            <tr>
-                <td>CRM System</td>
-                <td>Delta Corp</td>
-                <td>10 July 2026</td>
-                <td>Completed</td>
-            </tr>
-        </table>
+</form>
 
-    </div>
-<script src="script.js"></script>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+  authDomain: "software-company-system.firebaseapp.com",
+  projectId: "software-company-system",
+  storageBucket: "software-company-system.firebasestorage.app",
+  messagingSenderId: "332239602283",
+  appId: "1:332239602283:web:a309eee060b7b83a4d672e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.addProject = async function(e){
+    e.preventDefault();
+
+    await addDoc(collection(db, "projects"), {
+        client: document.getElementById("client").value,
+        company: document.getElementById("company").value,
+        type: document.getElementById("type").value,
+        deadline: document.getElementById("deadline").value
+    });
+
+    alert("Project Added 🔥");
+}
+</script>
+
 </body>
 </html>
