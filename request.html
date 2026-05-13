@@ -1,63 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request New Project</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Project</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
+
+<button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
 <div class="dashboard">
 
-    <h1>Request New Project</h1>
+<h1>Request New Project</h1>
 
-    <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="clients.html">Clients</a>
-        <a href="projects.html">Projects</a>
-        <a href="index.html">Logout</a>
-    </nav>
+<form onsubmit="addProject(event)">
 
-    <hr>
+<input type="text" id="client" placeholder="Client Name" required>
+<input type="text" id="company" placeholder="Company Name" required>
+<input type="email" id="email" placeholder="Email" required>
 
-    <h2>Client Project Request Form</h2>
+<select id="type">
+<option>Website</option>
+<option>Mobile App</option>
+<option>Desktop System</option>
+<option>CRM</option>
+</select>
 
-    <form>
+<input type="text" id="description" placeholder="Description" required>
+<input type="text" id="budget" placeholder="Budget" required>
+<input type="date" id="deadline" required>
 
-        <label>Client Name</label>
-        <input type="text" placeholder="Enter client name" required>
+<button type="submit">Add Project</button>
 
-        <label>Company Name</label>
-        <input type="text" placeholder="Enter company name" required>
-
-        <label>Email</label>
-        <input type="email" placeholder="Enter email" required>
-
-        <label>Project Type</label>
-        <select required>
-            <option>Website</option>
-            <option>Mobile Application</option>
-            <option>Desktop System</option>
-            <option>E-Commerce Platform</option>
-            <option>CRM System</option>
-        </select>
-
-        <label>Project Description</label>
-        <input type="text" placeholder="Describe the project" required>
-
-        <label>Budget</label>
-        <input type="text" placeholder="Enter budget" required>
-
-        <label>Deadline</label>
-        <input type="date" required>
-
-        <button type="submit">Submit Request</button>
-
-    </form>
+</form>
 
 </div>
-<script src="script.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+  authDomain: "software-company-system.firebaseapp.com",
+  projectId: "software-company-system",
+  storageBucket: "software-company-system.firebasestorage.app",
+  messagingSenderId: "332239602283",
+  appId: "1:332239602283:web:a309eee060b7b83a4d672e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.addProject = async function(e){
+    e.preventDefault();
+
+    await addDoc(collection(db, "projects"), {
+        client: document.getElementById("client").value,
+        company: document.getElementById("company").value,
+        type: document.getElementById("type").value,
+        deadline: document.getElementById("deadline").value
+    });
+
+    alert("Project Added 🔥");
+}
+</script>
+
 </body>
 </html>
