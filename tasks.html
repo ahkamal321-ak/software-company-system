@@ -6,81 +6,135 @@
     <title>Task Assignment</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
-    <div class="dashboard">
+<body onload="loadTheme(); loadTasks(); loadProjects();">
 
-        <h1>Task Assignment</h1>
+<button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
-        <nav>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="employees.html">Employees</a>
-            <a href="projects.html">Projects</a>
-            <a href="clients.html">Clients</a>
-        </nav>
+<div class="dashboard">
 
-        <hr>
+    <h1>Task Assignment</h1>
 
-        <h2>Assign Tasks to Developers</h2>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="employees.html">Employees</a>
+        <a href="projects.html">Projects</a>
+        <a href="clients.html">Clients</a>
+    </nav>
 
-        <table border="1" cellpadding="10">
-            <tr>
-                <th>Developer</th>
-                <th>Task</th>
-                <th>Project</th>
-                <th>Status</th>
-            </tr>
+    <hr>
 
-            <tr>
-                <td>Ahmed</td>
-                <td>Build Login Page</td>
-                <td>E-Commerce Website</td>
-                <td>In Progress</td>
-            </tr>
+    <h2>Tasks List</h2>
 
-            <tr>
-                <td>Omar</td>
-                <td>Create Database API</td>
-                <td>CRM System</td>
-                <td>Completed</td>
-            </tr>
+    <table id="tasksTable"></table>
 
-            <tr>
-                <td>Sara</td>
-                <td>Design Dashboard UI</td>
-                <td>Mobile Application</td>
-                <td>Under Review</td>
-            </tr>
-        </table>
+    <hr>
 
-        <hr>
+    <h2>Add New Task</h2>
 
-        <h2>Add New Task</h2>
+    <form onsubmit="addTask(event)">
 
-        <form>
-            <label>Developer Name</label>
-            <input type="text" placeholder="Enter developer name">
+        <label>Developer Name</label>
+        <input type="text" id="dev" placeholder="Enter developer name" required>
 
-            <label>Task Name</label>
-            <input type="text" placeholder="Enter task">
+        <label>Task Name</label>
+        <input type="text" id="task" placeholder="Enter task" required>
 
-            <label>Project Name</label>
-            <input type="text" placeholder="Enter project name">
+        <label>Project</label>
+        <input type="text" id="project" placeholder="Enter project" required>
 
-            <label>Status</label>
-            <select>
-                <option>Not Started</option>
-                <option>In Progress</option>
-                <option>Under Review</option>
-                <option>Completed</option>
-            </select>
 
-            <button type="submit" onclick="taskAdded()">Assign Task</button>
-        </form>
+        <!--<select id="project"></select>-->
 
-    </div>
-    <script src="script.js"></script>
+        <label>Status</label>
+        <select id="status">
+            <option>Not Started</option>
+            <option>In Progress</option>
+            <option>Under Review</option>
+            <option>Completed</option>
+        </select>
+
+        <button type="submit">Assign Task</button>
+
+    </form>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+  authDomain: "software-company-system.firebaseapp.com",
+  projectId: "software-company-system"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 🔥 تحميل المشاريع في dropdown
+async function loadProjects(){
+    let select = document.getElementById("project");
+
+    select.innerHTML = <option>Select Project</option>;
+
+    const data = await getDocs(collection(db,"projects"));
+
+    data.forEach(doc=>{
+        let p = doc.data();
+
+        select.innerHTML += `
+        <option value="${p.type} - ${p.client}">
+            ${p.type} - ${p.client}
+        </option>`;
+    });
+}
+
+// 🔥 إضافة Task
+window.addTask = async function(e){
+    e.preventDefault();
+
+    await addDoc(collection(db,"tasks"),{
+        dev: document.getElementById("dev").value,
+        task: document.getElementById("task").value,
+        project: document.getElementById("project").value,
+        status: document.getElementById("status").value
+    });
+
+    alert("Task Added 🔥");
+
+    loadTasks();
+};
+
+// 🔥 عرض Tasks
+async function loadTasks(){
+    let table = document.getElementById("tasksTable");
+
+    table.innerHTML = `
+    <tr>
+        <th>Developer</th>
+        <th>Task</th>
+        <th>Project</th>
+        <th>Status</th>
+    </tr>`;
+
+    const data = await getDocs(collection(db,"tasks"));
+
+    data.forEach(doc=>{
+        let t = doc.data();
+
+        table.innerHTML += `
+        <tr>
+            <td>${t.dev}</td>
+            <td>${t.task}</td>
+            <td>${t.project}</td>
+            <td>${t.status}</td>
+        </tr>`;
+    });
+}
+
+</script>
 
 </body>
 </html>
