@@ -15,49 +15,109 @@
 
 <h1>Projects</h1>
 
-<table id="projectsTable"></table>
+<table id="projectsTable" border="1" cellpadding="10">
+
+<tr>
+<th>Project</th>
+<th>Client</th>
+<th>Deadline</th>
+<th>Action</th>
+</tr>
+
+</table>
 
 </div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import {
+getFirestore,
+collection,
+getDocs,
+deleteDoc,
+doc
+
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
-  authDomain: "software-company-system.firebaseapp.com",
-  projectId: "software-company-system"
+
+apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+
+authDomain: "software-company-system.firebaseapp.com",
+
+projectId: "software-company-system"
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-window.loadProjects = async function(){
 
-    let table = document.getElementById("projectsTable");
+// 🔥 تحميل المشاريع
+async function loadProjects(){
 
-    table.innerHTML = `
-    <tr>
-        <th>Project</th>
-        <th>Client</th>
-        <th>Deadline</th>
-    </tr>`;
+let table = document.getElementById("projectsTable");
 
-    const data = await getDocs(collection(db,"projects"));
+table.innerHTML = `
+<tr>
+<th>Project</th>
+<th>Client</th>
+<th>Deadline</th>
+<th>Action</th>
+</tr>
+`;
 
-    data.forEach(doc=>{
-        let p = doc.data();
+const querySnapshot = await getDocs(collection(db, "projects"));
 
-        table.innerHTML += `
-        <tr>
-            <td>${p.type}</td>
-            <td>${p.client}</td>
-            <td>${p.deadline}</td>
-        </tr>`;
-    });
+querySnapshot.forEach((projectDoc) => {
+
+const p = projectDoc.data();
+
+table.innerHTML += `
+<tr>
+
+<td>${p.type}</td>
+
+<td>${p.client}</td>
+
+<td>${p.deadline}</td>
+
+<td>
+
+<button onclick="window.deleteProject('${projectDoc.id}')">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
 }
 
-window.onload = loadProjects;
+
+// 🔥 حذف مشروع
+window.deleteProject = async function(id){
+
+await deleteDoc(doc(db, "projects", id));
+
+alert("Project Deleted 🔥");
+
+loadProjects();
+
+}
+
+
+// 🔥 تشغيل
+loadProjects();
+
 </script>
 
 </body>
