@@ -1,38 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Notifications</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.notifications-container{
+
+margin-top:30px;
+
+}
+
+.notification-card{
+
+background:white;
+
+padding:20px;
+
+border-radius:18px;
+
+margin-bottom:20px;
+
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:20px;
+
+transition:0.3s;
+
+}
+
+.notification-card:hover{
+
+transform:translateY(-3px);
+
+}
+
+.notification-left{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+}
+
+.notification-icon{
+
+width:55px;
+height:55px;
+
+border-radius:50%;
+
+background:#2563eb;
+
+display:flex;
+
+align-items:center;
+justify-content:center;
+
+font-size:24px;
+color:white;
+
+}
+
+.notification-text h3{
+
+margin-bottom:6px;
+
+}
+
+.notification-text p{
+
+color:gray;
+font-size:14px;
+
+}
+
+.delete-btn{
+
+background:#dc2626;
+
+color:white;
+
+border:none;
+
+padding:10px 18px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-weight:bold;
+
+}
+
+.delete-btn:hover{
+
+opacity:0.9;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+margin-top:25px;
+
+}
+
+.card{
+
+background:white;
+
+padding:25px;
+
+border-radius:18px;
+
+text-align:center;
+
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+}
+
+.card h2{
+
+font-size:35px;
+
+margin-top:10px;
+
+}
+
+.empty{
+
+text-align:center;
+
+margin-top:40px;
+
+font-size:20px;
+
+color:gray;
+
+}
+
+</style>
+
 </head>
+
 <body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
+
+<button class="dark-btn"
+onclick="toggleDarkMode()">
+
+🌙
+
+</button>
 
 <div class="dashboard">
 
-    <h1>Notifications</h1>
+<h1>Notifications Center</h1>
 
-    <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="tasks.html">Tasks</a>
-        <a href="projects.html">Projects</a>
-        <a href="clients.html">Clients</a>
-    </nav>
 
-    <hr>
+<nav>
 
-    <h2>Recent Notifications</h2>
+<a href="dashboard.html">Dashboard</a>
 
-    <ul>
-        <li>New project request submitted by client.</li>
-        <li>Ahmed has completed the Login Page task.</li>
-        <li>Project deadline for CRM System is approaching.</li>
-        <li>Monthly financial report is ready for review.</li>
-        <li>New employee joined the Development Team.</li>
-    </ul>
+<a href="tasks.html">Tasks</a>
+
+<a href="projects.html">Projects</a>
+
+<a href="clients.html">Clients</a>
+
+</nav>
+
+<hr>
+
+
+
+<!-- 🔥 SUMMARY -->
+<div class="cards">
+
+<div class="card">
+
+<h3>Total Notifications</h3>
+
+<h2 id="notificationsCount">
+
+0
+
+</h2>
 
 </div>
+
+
+<div class="card">
+
+<h3>Unread Notifications</h3>
+
+<h2 id="unreadCount">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+<!-- 🔥 NOTIFICATIONS -->
+<div class="notifications-container"
+id="notificationsContainer">
+
+</div>
+
+</div>
+
+
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+
+getFirestore,
+collection,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+
+authDomain: "software-company-system.firebaseapp.com",
+
+projectId: "software-company-system"
+
+};
+
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+
+// 🔥 LOAD NOTIFICATIONS
+async function loadNotifications(){
+
+let container =
+document.getElementById(
+"notificationsContainer"
+);
+
+
+container.innerHTML = "";
+
+
+let total = 0;
+
+let unread = 0;
+
+
+
+const snapshot =
+await getDocs(
+collection(db,"notifications")
+);
+
+
+
+if(snapshot.empty){
+
+container.innerHTML = `
+
+<div class="empty">
+
+No Notifications Yet 🔔
+
+</div>
+
+`;
+
+}
+
+
+
+snapshot.forEach((notificationDoc)=>{
+
+
+let n =
+notificationDoc.data();
+
+
+total++;
+
+
+if(!n.read){
+
+unread++;
+
+}
+
+
+
+container.innerHTML += `
+
+<div class="notification-card">
+
+
+<div class="notification-left">
+
+
+<div class="notification-icon">
+
+🔔
+
+</div>
+
+
+<div class="notification-text">
+
+<h3>
+
+${n.message}
+
+</h3>
+
+<p>
+
+${n.time}
+
+</p>
+
+</div>
+
+</div>
+
+
+
+<div style="display:flex; gap:10px;">
+
+
+<button
+class="delete-btn"
+
+onclick="markAsRead(
+'${notificationDoc.id}'
+)">
+
+✔ Read
+
+</button>
+
+
+
+<button
+class="delete-btn"
+
+onclick="deleteNotification(
+'${notificationDoc.id}'
+)">
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+
+
+document.getElementById(
+"notificationsCount"
+).innerText =
+total;
+
+
+
+document.getElementById(
+"unreadCount"
+).innerText =
+unread;
+
+}
+
+
+
+// 🔥 DELETE
+window.deleteNotification =
+async function(id){
+
+await deleteDoc(
+doc(db,"notifications",id)
+);
+
+loadNotifications();
+
+}
+
+
+
+// 🔥 MARK AS READ
+window.markAsRead =
+async function(id){
+
+await updateDoc(
+
+doc(db,"notifications",id),
+
+{
+
+read:true
+
+}
+
+);loadNotifications();
+
+}
+
+
+
+loadNotifications();
+
+</script>
+
 <script src="script.js"></script>
+
 </body>
 </html>
