@@ -1,60 +1,495 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employees</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Employees Management</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+table{
+
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+
+}
+
+th, td{
+
+padding:14px;
+border:1px solid #ccc;
+text-align:center;
+
+}
+
+th{
+
+background:white;
+color:black;
+
+}
+
+form{
+
+display:flex;
+flex-direction:column;
+gap:15px;
+margin-top:25px;
+
+}
+
+input, select{
+
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+
+}
+
+button{
+
+padding:12px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+
+}
+
+.add-btn{
+
+background:#2563eb;
+color:white;
+
+}
+
+.delete-btn{
+
+background:#dc2626;
+color:white;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+margin-top:30px;
+margin-bottom:30px;
+
+}
+
+.card{
+
+background:white;
+
+color:black;
+
+padding:25px;
+
+border-radius:18px;
+
+text-align:center;
+
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+}
+
+.card h2{
+
+font-size:35px;
+
+}
+
+.active{
+
+color:#16a34a;
+font-weight:bold;
+
+}
+
+.leave{
+
+color:#dc2626;
+font-weight:bold;
+
+}
+
+</style>
+
 </head>
+
 <body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
-    <div class="dashboard">
+<button class="dark-btn"
+onclick="toggleDarkMode()">
 
-        <h1>Employee Management</h1>
+🌙
 
-        <nav>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="projects.html">Projects</a>
-            <a href="tasks.html">Tasks</a>
-            <a href="clients.html">Clients</a>
-        </nav>
+</button>
 
-        <hr>
+<div class="dashboard">
 
-        <h2>Employees List</h2>
+<h1>Employees Management</h1>
 
-        <table border="1" cellpadding="10">
-            <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Department</th>
-                <th>Status</th>
-            </tr>
 
-            <tr>
-                <td>Ahmed</td>
-                <td>Frontend Developer</td>
-                <td>Development</td>
-                <td>Active</td>
-            </tr>
+<nav class="modern-nav">
 
-            <tr>
-                <td>Omar</td>
-                <td>Backend Developer</td>
-                <td>Development</td>
-                <td>Active</td>
-            </tr>
+<a href="dashboard.html">Dashboard</a>
 
-            <tr>
-                <td>Sara</td>
-                <td>UI/UX Designer</td>
-                <td>Design</td>
-                <td>On Leave</td>
-            </tr>
-        </table>
+<a href="projects.html">Projects</a>
 
-    </div>
+<a href="tasks.html">Tasks</a>
+
+<a href="clients.html">Clients</a>
+
+</nav>
+
+<hr>
+
+
+<!-- 🔥 SUMMARY -->
+<div class="cards">
+
+<div class="card">
+
+<h3>Total Employees</h3>
+
+<h2 id="employeesCount">0</h2>
+
+</div>
+
+
+<div class="card">
+
+<h3>Active Employees</h3>
+
+<h2 id="activeEmployees">0</h2>
+
+</div>
+
+
+<div class="card">
+
+<h3>On Leave</h3>
+
+<h2 id="leaveEmployees">0</h2>
+
+</div>
+
+</div>
+
+
+
+<h2>Employees List</h2>
+
+
+<table id="employeesTable">
+
+<tr>
+
+<th>Name</th>
+
+<th>Position</th>
+
+<th>Department</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</table>
+
+
+<hr>
+
+
+<h2>Add Employee</h2>
+
+
+<form onsubmit="addEmployee(event)">
+
+
+<input
+type="text"
+id="name"
+placeholder="Employee Name"
+required>
+
+
+<select id="position">
+
+<option>Frontend Developer</option>
+
+<option>Backend Developer</option>
+
+<option>Full Stack Developer</option>
+
+<option>UI/UX Designer</option>
+
+<option>Project Manager</option>
+
+<option>QA Tester</option>
+
+<option>Database Engineer</option>
+
+</select>
+
+
+<select id="department">
+
+<option>Development</option>
+
+<option>Design</option>
+
+<option>Management</option>
+
+<option>Testing</option>
+
+<option>Database</option>
+
+</select>
+
+
+<select id="status">
+
+<option>Active</option>
+
+<option>On Leave</option>
+
+</select>
+
+
+<button
+type="submit"
+class="add-btn">
+
+Add Employee
+
+</button>
+
+</form>
+
+</div>
+
+
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+
+getFirestore,
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+
+authDomain: "software-company-system.firebaseapp.com",
+
+projectId: "software-company-system"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+
+// 🔥 Add Employee
+window.addEmployee = async function(e){
+
+e.preventDefault();
+
+
+await addDoc(collection(db,"employees"),{
+
+name:
+document.getElementById("name").value,
+
+position:
+document.getElementById("position").value,
+
+department:
+document.getElementById("department").value,
+
+status:
+document.getElementById("status").value
+
+});
+
+
+alert("Employee Added 🔥");
+
+
+document.querySelector("form").reset();
+
+loadEmployees();
+
+}
+
+
+
+// 🔥 Load Employees
+async function loadEmployees(){
+
+
+let table =
+document.getElementById("employeesTable");
+
+
+table.innerHTML = `
+
+<tr>
+
+<th>Name</th>
+
+<th>Position</th>
+
+<th>Department</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+`;
+
+
+let total = 0;
+
+let active = 0;
+
+let leave = 0;
+
+
+const querySnapshot =
+await getDocs(collection(db,"employees"));
+
+
+querySnapshot.forEach((employeeDoc)=>{let e = employeeDoc.data();
+
+total++;
+
+
+if(e.status === "Active"){
+
+active++;
+
+}else{
+
+leave++;
+
+}
+
+
+table.innerHTML += `
+
+<tr>
+
+<td>${e.name}</td>
+
+<td>${e.position}</td>
+
+<td>${e.department}</td>
+
+<td class="${
+e.status === "Active"
+? "active"
+: "leave"
+}">
+
+${e.status}
+
+</td>
+
+<td>
+
+<button
+class="delete-btn"
+onclick="deleteEmployee('${employeeDoc.id}')">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+
+
+// 🔥 Summary
+document.getElementById(
+"employeesCount"
+).innerText = total;
+
+
+document.getElementById(
+"activeEmployees"
+).innerText = active;
+
+
+document.getElementById(
+"leaveEmployees"
+).innerText = leave;
+
+}
+
+
+
+// 🔥 Delete Employee
+window.deleteEmployee = async function(id){
+
+await deleteDoc(doc(db,"employees",id));
+
+alert("Employee Deleted 🔥");
+
+loadEmployees();
+
+}
+
+
+
+// 🔥 تشغيل
+loadEmployees();
+
+</script>
+
 <script src="script.js"></script>
+
 </body>
 </html>
