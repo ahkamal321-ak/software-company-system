@@ -1,53 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Clients Management</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+table{
+
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+
+}
+
+th, td{
+
+padding:14px;
+border:1px solid #ccc;
+text-align:center;
+
+}
+
+th{
+
+background:#1e293b;
+color:white;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+margin-top:30px;
+margin-bottom:30px;
+
+}
+
+.card{
+
+background:#f8f9fa;
+
+color:white;
+
+padding:25px;
+
+border-radius:18px;
+
+text-align:center;
+
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+
+}
+
+.card h2{
+
+font-size:35px;
+
+}
+
+.email{
+
+color:#2563eb;
+font-weight:bold;
+
+}
+
+</style>
+
 </head>
+
 <body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
+
+<button class="dark-btn"
+onclick="toggleDarkMode()">
+
+🌙
+
+</button>
 
 <div class="dashboard">
 
-    <h1>Client Management</h1>
+<h1>Client Management</h1>
 
-    <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="employees.html">Employees</a>
-        <a href="projects.html">Projects</a>
-        <a href="tasks.html">Tasks</a>
-    </nav>
 
-    <hr>
+<nav class="modern-nav">
 
-    <h2>Clients List</h2>
+<a href="dashboard.html">Dashboard</a>
 
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>Client Name</th>
-            <th>Company</th>
-            <th>Email</th>
-            <th>Project</th>
-        </tr>
+<a href="employees.html">Employees</a>
 
-        <tr>
-            <td>Mohamed Ali</td>
-            <td>ABC Company</td>
-            <td>mohamed@abc.com</td>
-            <td>E-Commerce Website</td>
-        </tr>
+<a href="projects.html">Projects</a>
 
-        <tr>
-            <td>Sarah Ahmed</td>
-            <td>XYZ Group</td>
-            <td>sarah@xyz.com</td>
-            <td>Mobile App</td>
-        </tr>
-    </table>
+<a href="tasks.html">Tasks</a>
+
+</nav>
+
+<hr>
+
+
+<!-- 🔥 SUMMARY -->
+<div class="cards">
+
+<div class="card">
+
+<h3>Total Clients</h3>
+
+<h2 id="clientsCount">0</h2>
 
 </div>
+
+
+<div class="card">
+
+<h3>Active Projects</h3>
+
+<h2 id="projectsCount">0</h2>
+
+</div>
+
+</div>
+
+
+
+<h2>Clients List</h2>
+
+
+<table id="clientsTable">
+
+<tr>
+
+<th>Client Name</th>
+
+<th>Company</th>
+
+<th>Email</th>
+
+<th>Project</th>
+
+<th>Budget</th>
+
+<th>Status</th>
+
+</tr>
+
+</table>
+
+</div>
+
+
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+
+getFirestore,
+collection,
+getDocs
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+
+authDomain: "software-company-system.firebaseapp.com",
+
+projectId: "software-company-system"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+
+// 🔥 Load Clients
+async function loadClients(){
+
+
+let table =
+document.getElementById("clientsTable");
+
+
+table.innerHTML = `
+
+<tr>
+
+<th>Client Name</th>
+
+<th>Company</th>
+
+<th>Email</th>
+
+<th>Project</th>
+
+<th>Budget</th>
+
+<th>Status</th>
+
+</tr>
+
+`;
+
+
+let totalClients = 0;
+
+let totalProjects = 0;
+
+
+const querySnapshot =
+await getDocs(collection(db,"projects"));
+
+
+querySnapshot.forEach((projectDoc)=>{
+
+let p = projectDoc.data();
+
+
+totalClients++;
+
+totalProjects++;
+
+
+table.innerHTML += `
+
+<tr>
+
+<td>${p.client}</td>
+
+<td>${p.company}</td>
+
+<td class="email">${p.email}</td>
+
+<td>${p.type}</td>
+
+<td>$${p.budget}</td>
+
+<td>${p.status}</td>
+
+</tr>
+
+`;
+
+});
+
+
+
+// 🔥 Summary
+document.getElementById(
+"clientsCount"
+).innerText =
+totalClients;
+
+
+document.getElementById(
+"projectsCount"
+).innerText =
+totalProjects;
+
+}
+
+
+
+// 🔥 تشغيل
+loadClients();
+
+</script>
+
 <script src="script.js"></script>
+
 </body>
 </html>
