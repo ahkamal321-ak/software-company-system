@@ -1,48 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Software Company System</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Sign Up - Software Company System</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+small{
+
+display:block;
+margin-top:8px;
+margin-bottom:15px;
+color:gray;
+
+}
+
+</style>
+
 </head>
+
 <body onload="loadTheme()">
-    <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
-    <div class="login-container">
-        <h1>Software Company System</h1>
-        <h2>Create New Account</h2>
+<button class="dark-btn"
+onclick="toggleDarkMode()">
 
-        <form onsubmit="registerUser(event)">
+🌙
 
-    <label>Full Name</label>
-    <input type="text" id="fullName" placeholder="Enter your full name" required>
+</button>
 
-    <label>Email</label>
-    <input type="email" id="signupEmail" placeholder="Enter your email" required>
+<div class="login-container">
 
-    <label>Password</label>
-    <input type="password" id="signupPassword" placeholder="Create password" required>
+<h1>Software Company System</h1>
 
-    <label>Select Role</label>
-    <select id="role" required>
-        <option>Admin</option>
-        <option>Employee</option>
-        <option>Client</option>
-        <option>Team Leader</option>
-        <option>Accountant</option>
-    </select>
+<h2>Create New Account</h2>
 
-    <button type="submit">Create Account</button>
+
+<form onsubmit="registerUser(event)">
+
+<label>Full Name</label>
+
+<input
+type="text"
+id="fullName"
+placeholder="Enter your full name"
+required>
+
+
+<label>Email</label>
+
+<input
+type="email"
+id="signupEmail"
+placeholder="Enter your email"
+required>
+
+
+<label>Password</label>
+
+<input
+type="password"
+id="signupPassword"
+placeholder="Create password"
+required>
+
+
+<small>
+
+Password must contain:
+8 characters, capital letter,
+number, and special character.
+
+</small>
+
+
+<label>Select Role</label>
+
+<select id="role" required>
+
+<option>Admin</option>
+
+<option>Employee</option>
+
+<option>Client</option>
+
+<option>Team Leader</option>
+
+<option>Accountant</option>
+
+</select>
+
+
+<button type="submit">
+
+Create Account
+
+</button>
 
 </form>
 
-        <p style="text-align:center; margin-top:20px;">
-            Already have an account?
-            <a href="index.html">Login Here</a>
-        </p>
-    </div>
-    <script src="script.js"></script>
+
+
+<p style="text-align:center; margin-top:20px;">
+
+Already have an account?
+
+<a href="index.html">
+
+Login Here
+
+</a>
+
+</p>
+
+</div>
+
+
+
+<script type="module">
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+
+getAuth,
+createUserWithEmailAndPassword,
+updateProfile
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+
+getFirestore,
+doc,
+setDoc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+
+authDomain: "software-company-system.firebaseapp.com",
+
+projectId: "software-company-system"
+
+};
+
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+
+// 🔥 Register Function
+window.registerUser = async function(event){
+
+event.preventDefault();
+
+
+
+// Inputs
+let fullName =
+document.getElementById("fullName").value.trim();
+
+let email =
+document.getElementById("signupEmail").value.trim();
+
+let password =
+document.getElementById("signupPassword").value;
+
+let role =
+document.getElementById("role").value;
+
+
+
+
+// ✅ Full Name Validation
+if(fullName.length < 3){
+
+alert(
+"Full name must be at least 3 characters"
+);
+
+return;
+
+}
+
+
+
+
+// ✅ Email Validation
+let emailPattern =
+/^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+
+if(!email.match(emailPattern)){
+
+alert("Enter a valid email");
+
+return;
+
+}
+
+
+
+
+// ✅ Password Validation
+let passwordPattern =
+/^(?=.*[A-Z])(?=.*[0-9])(?=.*[\W]).{8,}$/;
+
+
+if(!password.match(passwordPattern)){
+
+alert(
+
+`Password must contain:
+
+- At least 8 characters
+- One capital letter
+- One number
+- One special character`
+
+);
+
+return;
+
+}
+
+
+
+try{
+
+
+// 🔥 Create Account
+const userCredential =
+await createUserWithEmailAndPassword(
+
+auth,
+email,
+password
+
+);
+
+
+const user =
+userCredential.user;
+
+
+
+// 🔥 Save Name In Firebase Auth
+await updateProfile(user, {
+
+displayName: fullName
+
+});
+
+
+
+// 🔥 Save Extra Data In Firestore
+await setDoc(doc(db, "users", user.uid), {
+
+fullName: fullName,
+
+email: email,
+
+role: role,
+
+createdAt: new Date()
+
+});
+
+
+
+alert(
+"Account Created Successfully 🔥"
+);
+
+
+
+// Redirect
+window.location.href = "index.html";
+
+
+}catch(error){
+
+
+if(
+error.code ===
+"auth/email-already-in-use"
+){
+
+alert("Email already exists");
+
+}
+
+
+else if(
+error.code ===
+"auth/weak-password"
+){
+
+alert("Weak password");
+
+}
+
+
+else{
+
+alert(error.message);
+
+}
+
+}
+
+}
+
+</script>
+
+<script src="script.js"></script>
 
 </body>
 </html>
