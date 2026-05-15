@@ -4,137 +4,392 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Assignment</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        table{
+
+            width:100%;
+            border-collapse:collapse;
+            margin-top:20px;
+
+        }
+
+        th, td{
+
+            padding:12px;
+            border:1px solid #ccc;
+            text-align:center;
+
+        }
+
+        th{
+
+            background:#1e293b;
+            color:white;
+
+        }
+
+        form{
+
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+            margin-top:20px;
+
+        }
+
+        input, select{
+
+            padding:12px;
+            border-radius:10px;
+            border:1px solid #ccc;
+
+        }
+
+        button{
+
+            padding:12px;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            font-weight:bold;
+
+        }
+
+        .add-btn{
+
+            background:#2563eb;
+            color:white;
+
+        }
+
+        .delete-btn{
+
+            background:#dc2626;
+            color:white;
+
+        }
+
+    </style>
+
 </head>
 
-<body onload="loadTheme(); loadTasks(); loadProjects();">
+<body onload="loadTheme()">
 
 <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
 
 <div class="dashboard">
 
-    <h1>Task Assignment</h1>
+<h1>Task Assignment</h1>
 
-    <nav>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="employees.html">Employees</a>
-        <a href="projects.html">Projects</a>
-        <a href="clients.html">Clients</a>
-    </nav>
+<nav class="modern-nav">
 
-    <hr>
+<a href="dashboard.html">Dashboard</a>
 
-    <h2>Tasks List</h2>
+<a href="employees.html">Employees</a>
 
-    <table id="tasksTable"></table>
+<a href="projects.html">Projects</a>
 
-    <hr>
+<a href="clients.html">Clients</a>
 
-    <h2>Add New Task</h2>
+</nav>
 
-    <form onsubmit="addTask(event)">
+<hr>
 
-        <label>Developer Name</label>
-        <input type="text" id="dev" placeholder="Enter developer name" required>
+<h2>Tasks List</h2>
 
-        <label>Task Name</label>
-        <input type="text" id="task" placeholder="Enter task" required>
+<table id="tasksTable">
 
-        <label>Project</label>
-        <input type="text" id="project" placeholder="Enter project" required>
+<tr>
+
+<th>Developer</th>
+
+<th>Task</th>
+
+<th>Project</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</table>
+
+<hr>
+
+<h2>Add New Task</h2>
+
+<form onsubmit="addTask(event)">
+
+<label>Developer Name</label>
+
+<input
+type="text"
+id="dev"
+placeholder="Enter developer name"
+required>
 
 
-        <!--<select id="project"></select>-->
+<label>Task Name</label>
 
-        <label>Status</label>
-        <select id="status">
-            <option>Not Started</option>
-            <option>In Progress</option>
-            <option>Under Review</option>
-            <option>Completed</option>
-        </select>
+<input
+type="text"
+id="task"
+placeholder="Enter task"
+required>
 
-        <button type="submit">Assign Task</button>
 
-    </form>
+<label>Project</label>
+
+<select id="project" required>
+
+<option value="">
+Select Project
+</option>
+
+</select>
+
+
+<label>Status</label>
+
+<select id="status">
+
+<option>Not Started</option>
+
+<option>In Progress</option>
+
+<option>Under Review</option>
+
+<option>Completed</option>
+
+</select>
+
+
+<button
+type="submit"
+class="add-btn">
+
+Assign Task
+
+</button>
+
+</form>
 
 </div>
 
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+
+getFirestore,
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
-  authDomain: "software-company-system.firebaseapp.com",
-  projectId: "software-company-system"
+
+apiKey: "AIzaSyA07btz16R5Q4wV-ASLFZwm7CZfd789KS4",
+
+authDomain: "software-company-system.firebaseapp.com",
+
+projectId: "software-company-system"
+
 };
 
+
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-// 🔥 تحميل المشاريع في dropdown
+
+
+// 🔥 تحميل المشاريع
 async function loadProjects(){
-    let select = document.getElementById("project");
 
-    select.innerHTML = <option>Select Project</option>;
+let select =
+document.getElementById("project");
 
-    const data = await getDocs(collection(db,"projects"));
 
-    data.forEach(doc=>{
-        let p = doc.data();
+select.innerHTML = `
+<option value="">
+Select Project
+</option>
+`;
 
-        select.innerHTML += `
-        <option value="${p.type} - ${p.client}">
-            ${p.type} - ${p.client}
-        </option>`;
-    });
+
+const querySnapshot =
+await getDocs(collection(db,"projects"));
+
+
+querySnapshot.forEach((projectDoc)=>{
+
+let p = projectDoc.data();
+
+select.innerHTML += `
+
+<option value="${p.type}">
+
+${p.type}
+
+</option>
+
+`;
+
+});
+
 }
+
+
 
 // 🔥 إضافة Task
 window.addTask = async function(e){
-    e.preventDefault();
 
-    await addDoc(collection(db,"tasks"),{
-        dev: document.getElementById("dev").value,
-        task: document.getElementById("task").value,
-        project: document.getElementById("project").value,
-        status: document.getElementById("status").value
-    });
+e.preventDefault();
 
-    alert("Task Added 🔥");
 
-    loadTasks();
+await addDoc(collection(db,"tasks"),{
+
+dev:
+document.getElementById("dev").value,
+
+task:
+document.getElementById("task").value,
+
+project:
+document.getElementById("project").value,
+
+status:
+document.getElementById("status").value
+
+});
+
+
+alert("Task Added Successfully 🔥");
+
+
+// تنظيف الفورم
+document.getElementById("dev").value = "";
+
+document.getElementById("task").value = "";
+
+document.getElementById("project").value = "";
+
+document.getElementById("status").value =
+"Not Started";
+
+
+// تحديث الجدول
+loadTasks();
+
 };
 
-// 🔥 عرض Tasks
+
+
+// 🔥 تحميل التاسكات
 async function loadTasks(){
-    let table = document.getElementById("tasksTable");
 
-    table.innerHTML = `
-    <tr>
-        <th>Developer</th>
-        <th>Task</th>
-        <th>Project</th>
-        <th>Status</th>
-    </tr>`;
+let table =
+document.getElementById("tasksTable");
 
-    const data = await getDocs(collection(db,"tasks"));
 
-    data.forEach(doc=>{
-        let t = doc.data();
+table.innerHTML = `
 
-        table.innerHTML += `
-        <tr>
-            <td>${t.dev}</td>
-            <td>${t.task}</td>
-            <td>${t.project}</td>
-            <td>${t.status}</td>
-        </tr>`;
-    });
+<tr>
+
+<th>Developer</th>
+
+<th>Task</th>
+
+<th>Project</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+`;
+
+
+const querySnapshot =await getDocs(collection(db,"tasks"));
+
+
+querySnapshot.forEach((taskDoc)=>{
+
+let t = taskDoc.data();
+
+table.innerHTML += `
+
+<tr>
+
+<td>${t.dev}</td>
+
+<td>${t.task}</td>
+
+<td>${t.project}</td>
+
+<td>${t.status}</td>
+
+<td>
+
+<button
+class="delete-btn"
+onclick="deleteTask('${taskDoc.id}')">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
 }
 
+
+
+// 🔥 حذف التاسك
+window.deleteTask = async function(id){
+
+await deleteDoc(doc(db,"tasks",id));
+
+alert("Task Deleted 🔥");
+
+loadTasks();
+
+}
+
+
+
+// 🔥 تشغيل
+loadProjects();
+
+loadTasks();
+
 </script>
+
+<script src="script.js"></script>
 
 </body>
 </html>
